@@ -148,9 +148,9 @@
       border-top: 1px dashed #aaa;
     }
 
-    .counter { margin-top: 22px; text-align: center; color: #555; }
+    .counter { margin-top: 120px; text-align: center; color: #555; }
 
-    .counter strong {
+    .counter strong {	
       padding: 3px 8px;
       background: black;
       color: lime;
@@ -370,7 +370,7 @@
         <span aria-hidden="true">🖥️</span>내 홈페이지
       </button>
       <button class="shortcut" id="virusIcon" data-region="virus-icon">
-        <span aria-hidden="true">🎁</span>저는 바이러스가 아닙니다.
+        <span aria-hidden="true">🐹</span>저는 바이러스가<br> 아닙니다.
       </button>
     </nav>
 
@@ -390,7 +390,7 @@
 
       <div class="addressbar" data-region="addressbar">
         <label for="address">주소(D)</label>
-        <input id="address" value="https://my.home/home" readonly>
+        <input id="address" value="https://hamrang/home" readonly>
       </div>
 
       <div class="window-body" data-region="main-body">
@@ -399,31 +399,23 @@
           <!-- 홈 내용 수정 -->
           <section class="page-panel" id="home" data-region="home-page">
             <div class="hero" data-region="hero">
-              <div class="badge">★ WELCOME TO MY CYBER SPACE ★</div>
-              <h1>Hello, I'm Min!</h1>
-              <p>만들고, 기록하고, 연결하는 것을 좋아합니다.<br>
-                저의 작은 인터넷 공간에 오신 것을 환영합니다.</p>
+              <div class="badge">어서오세요</div>
+              <h1 style="color:red">햄랑의효능!</h1>
+              <p>햄랑을 섭취하면<br>
+                4층에서 살고 문지방을 밟고 밤에 손톱을 깎아도<br>  
+                살아갈 수 있습니다</p>
             </div>
 
             <hr class="divider">
 
-            <div class="cards" data-region="home-cards">
-              <section class="card" data-region="news-card">
-                <h3>📌 What's New</h3>
-                <p>Windows 98 홈페이지 오픈!<br>새로운 프로젝트를 준비 중입니다.</p>
-              </section>
-              <section class="card" data-region="contact-card">
-                <h3>💌 Let's Connect</h3>
-                <p><a href="mailto:hello@example.com">hello@example.com</a><br>
-                  오늘도 좋은 하루 보내세요.</p>
-              </section>
-            </div>
+  
 
             <div class="counter" data-region="counter">
-              YOU ARE VISITOR <strong>000098</strong><br>
-              <small>장식용 카운터 · Welcome to my homepage.</small>
+              YOU ARE VISITOR <strong>000444</strong><br>
+              <small>(=ↀωↀ=) ૮( ́。ᴖ ꈊ ᴖ。`)ა </small>
             </div>
           </section>
+
 
           <!-- 소개 내용 수정 -->
           <section class="page-panel" id="about" data-region="about-page" hidden>
@@ -512,7 +504,7 @@
   <aside class="window start-menu" id="startMenu"
          data-region="start-menu" aria-label="시작 메뉴" hidden>
     <div class="start-inner">
-      <div class="start-brand" data-region="start-brand">Windows 98</div>
+      <div class="start-brand" data-region="start-brand">Hamdows 98</div>
       <div class="start-items" data-region="start-items">
         <button id="startHome">🖥️ 내 홈페이지</button>
         <hr>
@@ -531,7 +523,7 @@
               aria-pressed="true" aria-controls="mainWindow">🌐 My Homepage</button>
       <button class="task-button" id="virusTask" data-region="virus-task"
               aria-pressed="false" aria-controls="virusWindow" hidden>
-        🎁 저는 바이러스가 아닙니다.
+        🐹 저는 바이러스가 아닙니다.
       </button>
     </div>
 
@@ -587,7 +579,7 @@
       });
 
       content.scrollTop = 0;
-      $("#address").value = "https://my.home/" + page;
+      $("#address").value = "https://hamrang/" + page;
       status.textContent = "✓ 완료";
       setVisible(mainWindow, homeTask, true);
       setStartMenu(false);
