@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Homepage</title>
+  <link rel="stylesheet" href="https://unpkg.com/98.css">
+
+  <style>
+    /* ===== 01. 공통 설정: 기본 글꼴, 배경, 작업 표시줄 높이 ===== */
+    :root {
+      --taskbar-height: 42px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #008080;
+      font-family: "MS Sans Serif", "돋움", sans-serif;
+      font-size: 12px;
+    }
+
+    button, input, textarea { font-family: inherit; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
+
+    /* ===== 02. 바탕화면: 홈페이지 창의 위치와 여백 ===== */
+    .desktop {
+      min-height: 100vh;
+      padding: 36px 24px calc(var(--taskbar-height) + 28px) 150px;
+    }
+
+    /* ===== 03. 바탕화면 아이콘: 세로 배치 ===== */
+    .shortcuts {
+      position: absolute;
+      top: 20px;
+      left: 12px;
+      display: grid;
+      gap: 22px;
+      width: 116px;
+    }
+
+    .shortcut,
+    .shortcut:active {
+      width: 100%;
+      min-width: 0;
+      padding: 5px;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+      color: white;
+      line-height: 1.6;
+      text-align: center;
+      text-shadow: 1px 1px black;
+    }
+
+    .shortcut span {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 34px;
+    }
+
+    .shortcut:focus-visible { outline: 1px dotted white; }
+
+    /* ===== 04. 홈페이지 창: 전체 너비와 제목 표시줄 ===== */
+    .main-window {
+      width: min(780px, 100%);
+      margin: auto;
+    }
+
+    .title-bar { min-height: 24px; }
+
+    /* ===== 05. 메뉴바: 홈 / 소개 / 프로젝트 / 방명록 ===== */
+    .menubar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      padding: 9px 8px;
+    }
+
+    .menubar a {
+      color: black;
+      text-decoration: none;
+    }
+
+    .menubar a[aria-current="page"] { font-weight: bold; }
+    .menubar a:focus-visible { outline: 1px dotted black; }
+
+    /* ===== 06. 주소 표시줄: 화면 표시용 주소이며 실제 이동하지 않음 ===== */
+    .addressbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border-top: 1px solid #808080;
+    }
+
+    .addressbar input {
+      flex: 1;
+      min-width: 0;
+      height: 23px;
+    }
+
+    /* ===== 07. 흰색 본문: 모든 메뉴에서 같은 높이 사용 ===== */
+    .page {
+      height: 440px;
+      overflow: auto;
+      padding: 26px;
+      background: white;
+      line-height: 1.8;
+      box-shadow: inset 1px 1px #808080;
+    }
+
+    .page-panel { min-height: 100%; }
+    .page h2 { margin-top: 0; font-size: 22px; color: #000080; }
+
+    /* ===== 08. 홈 화면: 인사말, 카드, 장식용 방문 카운터 ===== */
+    .hero { padding: 10px 0 20px; text-align: center; }
+
+    .hero h1 {
+      margin: 12px 0;
+      color: #000080;
+      font-family: Georgia, serif;
+      font-size: clamp(26px, 5vw, 38px);
+    }
+
+    .badge { color: #000080; letter-spacing: 2px; font-size: 11px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      padding: 14px;
+      border: 1px solid #aaa;
+      background: #ffffed;
+    }
+
+    .card h3 { margin: 0 0 8px; font-size: 14px; }
+    .card p { margin: 0; }
+
+    .divider {
+      margin: 20px 0;
+      border: 0;
+      border-top: 1px dashed #aaa;
+    }
+
+    .counter { margin-top: 22px; text-align: center; color: #555; }
+
+    .counter strong {
+      padding: 3px 8px;
+      background: black;
+      color: lime;
+      font-family: monospace;
+      letter-spacing: 3px;
+    }
+
+    /* ===== 09. 홈페이지 하단 상태표시줄 ===== */
+    .status-bar { margin-top: 8px; }
+    .status-bar-field { white-space: nowrap; }
+
+    /* ===== 10. 방명록: 작성 폼과 저장된 메시지 ===== */
+    .guest-form { display: grid; gap: 10px; }
+    .guest-form input, .guest-form textarea { width: 100%; }
+    .guest-form textarea { min-height: 75px; resize: vertical; }
+    .guest-form button { justify-self: end; }
+
+    .guest-entry {
+      padding: 10px 0;
+      border-bottom: 1px dotted #aaa;
+    }
+
+    .guest-entry p {
+      margin: 4px 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    /* ===== 11. 장난용 팝업: 위치는 JS에서 설정 ===== */
+    .virus-window {
+      position: fixed;
+      width: min(360px, calc(100vw - 16px));
+      max-height: calc(100dvh - var(--taskbar-height));
+      overflow: auto;
+      z-index: 200;
+    }
+
+    /* 제목 표시줄만 마우스 또는 터치로 드래그 가능 */
+    .virus-window .title-bar {
+      cursor: move;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .virus-window .title-bar-controls { cursor: default; }
+
+    .virus-body {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 8px;
+    }
+
+    .warning-icon { font-size: 36px; }
+    .virus-body p { line-height: 1.8; }
+    .popup-actions { margin-bottom: 12px; text-align: center; }
+
+    /* ===== 12. 화면 하단 작업 표시줄: 시작 버튼, 창 목록, 시계 ===== */
+    .taskbar {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 1000;
+      height: var(--taskbar-height);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px;
+      background: #c0c0c0;
+      box-shadow: inset 0 1px white, inset 0 2px #dfdfdf;
+    }
+
+    .start-button {
+      min-width: 76px;
+      height: 29px;
+      font-weight: bold;
+    }
+
+    .tasks { display: flex; flex: 1; gap: 5px; min-width: 0; }
+
+    .task-button {
+      width: 210px;
+      height: 28px;
+      min-width: 0;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .task-button.active {
+      background: #ddd;
+      font-weight: bold;
+      box-shadow: inset -1px -1px white, inset 1px 1px #0a0a0a,
+                  inset -2px -2px #dfdfdf, inset 2px 2px #808080;
+    }
+
+    .tray {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 27px;
+      padding: 0 10px;
+      flex-shrink: 0;
+      box-shadow: inset 1px 1px #808080, inset -1px -1px white;
+    }
+
+    /* ===== 13. 시작 메뉴: 홈페이지 열기 / 바탕화면 보기 ===== */
+    .start-menu {
+      position: fixed;
+      bottom: var(--taskbar-height);
+      left: 4px;
+      width: 220px;
+      z-index: 1001;
+    }
+
+    .start-inner { display: flex; }
+
+    .start-brand {
+      padding: 12px 5px;
+      background: #808080;
+      color: #ddd;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 21px;
+      font-weight: bold;
+    }
+
+    .start-items { flex: 1; padding: 3px; }
+
+    .start-items button {
+      width: 100%;
+      padding: 14px 8px;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+      text-align: left;
+    }
+
+    .start-items button:hover,
+    .start-items button:focus-visible {
+      background: #000080;
+      color: white;
+    }
+
+    /* ===== 14. 모바일: 아이콘 가로 배치, 카드 한 열 배치 ===== */
+    @media (max-width: 600px) {
+      .desktop {
+        padding: 150px 8px calc(var(--taskbar-height) + 16px);
+      }
+
+      .shortcuts { display: flex; width: auto; top: 10px; gap: 10px; }
+      .shortcut { width: 112px; }
+      .page { padding: 18px; }
+      .cards { grid-template-columns: 1fr; }
+      .task-button { flex: 1; width: 0; }
+      .tray { padding: 0 5px; }
+      .tray span { display: none; }
+      .status-bar-field:last-child { display: none; }
+    }
+
+    /* ===== 15. 수정용 영역 테두리 =====
+       HTML의 data-region 이름과 아래 색상을 연결합니다.
+       body의 class="debug"를 삭제하면 모든 수정용 테두리가 꺼집니다.
+       실제 border이므로 켰을 때 내부 공간이 조금 줄어듭니다.
+    */
+    .debug [data-region] { border: 2px solid var(--region-color); }
+
+    [data-region="desktop"]       { --region-color: #ff1744; } /* 바탕화면 */
+    [data-region="shortcuts"]     { --region-color: #ff9100; } /* 아이콘 묶음 */
+    [data-region="home-icon"]     { --region-color: #ffff00; } /* 홈페이지 아이콘 */
+    [data-region="virus-icon"]    { --region-color: #76ff03; } /* 장난 아이콘 */
+    [data-region="main-window"]   { --region-color: #00e5ff; } /* 홈페이지 창 */
+    [data-region="main-title"]    { --region-color: #f500ff; } /* 창 제목 */
+    [data-region="menubar"]       { --region-color: #2979ff; } /* 메뉴바 */
+    [data-region="addressbar"]    { --region-color: #ff6e40; } /* 주소 표시줄 */
+    [data-region="main-body"]     { --region-color: #8d6e63; } /* 본문+상태줄 */
+    [data-region="content"]       { --region-color: #00bfa5; } /* 흰색 본문 */
+    [data-region="home-page"]     { --region-color: #c51162; } /* 홈 전체 */
+    [data-region="hero"]          { --region-color: #6200ea; } /* 홈 인사말 */
+    [data-region="home-cards"]    { --region-color: #0091ea; } /* 홈 카드 묶음 */
+    [data-region="news-card"]     { --region-color: #d50000; } /* 소식 카드 */
+    [data-region="contact-card"]  { --region-color: #558b2f; } /* 연락처 카드 */
+    [data-region="counter"]       { --region-color: #ffab00; } /* 방문 카운터 */
+    [data-region="about-page"]    { --region-color: #304ffe; } /* 소개 전체 */
+    [data-region="profile"]       { --region-color: #aa00ff; } /* 프로필 */
+    [data-region="projects-page"] { --region-color: #00695c; } /* 프로젝트 전체 */
+    [data-region="project-cards"] { --region-color: #ef6c00; } /* 프로젝트 묶음 */
+    [data-region="project-one"]   { --region-color: #ad1457; } /* 프로젝트 1 */
+    [data-region="project-two"]   { --region-color: #4527a0; } /* 프로젝트 2 */
+    [data-region="guest-page"]    { --region-color: #00838f; } /* 방명록 전체 */
+    [data-region="guest-form"]    { --region-color: #9e9d24; } /* 작성 폼 */
+    [data-region="guest-list"]    { --region-color: #bf360c; } /* 메시지 목록 */
+    [data-region="statusbar"]     { --region-color: #3949ab; } /* 상태표시줄 */
+    [data-region="virus-window"]  { --region-color: #ff4081; } /* 팝업 전체 */
+    [data-region="virus-title"]   { --region-color: #64dd17; } /* 팝업 제목 */
+    [data-region="virus-body"]    { --region-color: #00b0ff; } /* 팝업 메시지 */
+    [data-region="virus-actions"] { --region-color: #d500f9; } /* 팝업 확인 영역 */
+    [data-region="start-menu"]    { --region-color: #ffd600; } /* 시작 메뉴 */
+    [data-region="start-brand"]   { --region-color: #1de9b6; } /* Windows 글자 */
+    [data-region="start-items"]   { --region-color: #ff5722; } /* 시작 메뉴 목록 */
+    [data-region="taskbar"]       { --region-color: #e040fb; } /* 작업 표시줄 */
+    [data-region="start-button"]  { --region-color: #00c853; } /* 시작 버튼 */
+    [data-region="tasks"]         { --region-color: #536dfe; } /* 실행 창 목록 */
+    [data-region="home-task"]     { --region-color: #c6ff00; } /* 홈페이지 작업 */
+    [data-region="virus-task"]    { --region-color: #ff80ab; } /* 팝업 작업 */
+    [data-region="tray"]          { --region-color: #18ffff; } /* 시계 영역 */
+  </style>
+</head>
+
+<!-- 수정용 테두리 OFF: class="debug" 삭제 -->
+<body class="debug">
+  <main class="desktop" data-region="desktop">
+
+    <!-- 바탕화면 아이콘: 이름과 이모지는 여기에서 수정 -->
+    <nav class="shortcuts" data-region="shortcuts" aria-label="바탕화면 바로가기">
+      <button class="shortcut" id="homeIcon" data-region="home-icon">
+        <span aria-hidden="true">🖥️</span>내 홈페이지
+      </button>
+      <button class="shortcut" id="virusIcon" data-region="virus-icon">
+        <span aria-hidden="true">🎁</span>저는 바이러스가 아닙니다.
+      </button>
+    </nav>
+
+    <!-- 홈페이지 창 -->
+    <section class="window main-window" id="mainWindow"
+             data-region="main-window" aria-label="내 홈페이지">
+      <div class="title-bar" data-region="main-title">
+        <div class="title-bar-text">🌐 My Homepage - Internet Explorer</div>
+      </div>
+
+      <nav class="menubar" data-region="menubar" aria-label="홈페이지 메뉴">
+        <a href="#home" data-page="home" aria-current="page">홈(H)</a>
+        <a href="#about" data-page="about">소개(A)</a>
+        <a href="#projects" data-page="projects">프로젝트(P)</a>
+        <a href="#guestbook" data-page="guestbook">방명록(G)</a>
+      </nav>
+
+      <div class="addressbar" data-region="addressbar">
+        <label for="address">주소(D)</label>
+        <input id="address" value="https://my.home/home" readonly>
+      </div>
+
+      <div class="window-body" data-region="main-body">
+        <article class="page" id="content" data-region="content">
+
+          <!-- 홈 내용 수정 -->
+          <section class="page-panel" id="home" data-region="home-page">
+            <div class="hero" data-region="hero">
+              <div class="badge">★ WELCOME TO MY CYBER SPACE ★</div>
+              <h1>Hello, I'm Min!</h1>
+              <p>만들고, 기록하고, 연결하는 것을 좋아합니다.<br>
+                저의 작은 인터넷 공간에 오신 것을 환영합니다.</p>
+            </div>
+
+            <hr class="divider">
+
+            <div class="cards" data-region="home-cards">
+              <section class="card" data-region="news-card">
+                <h3>📌 What's New</h3>
+                <p>Windows 98 홈페이지 오픈!<br>새로운 프로젝트를 준비 중입니다.</p>
+              </section>
+              <section class="card" data-region="contact-card">
+                <h3>💌 Let's Connect</h3>
+                <p><a href="mailto:hello@example.com">hello@example.com</a><br>
+                  오늘도 좋은 하루 보내세요.</p>
+              </section>
+            </div>
+
+            <div class="counter" data-region="counter">
+              YOU ARE VISITOR <strong>000098</strong><br>
+              <small>장식용 카운터 · Welcome to my homepage.</small>
+            </div>
+          </section>
+
+          <!-- 소개 내용 수정 -->
+          <section class="page-panel" id="about" data-region="about-page" hidden>
+            <h2>👤 About Me</h2>
+            <p>안녕하세요! 작은 아이디어를 현실로 만드는 Min입니다.</p>
+            <fieldset data-region="profile">
+              <legend>프로필</legend>
+              <p><b>관심사</b> — 웹 개발, 디자인, 사진</p>
+              <p><b>좋아하는 것</b> — 커피, 오래된 UI, 새로운 아이디어</p>
+              <p><b>요즘 목표</b> — 매주 하나씩 만들어 공개하기</p>
+            </fieldset>
+            <hr class="divider">
+            <p>이 홈페이지는 저의 작업과 일상을 담는 디지털 서랍입니다.</p>
+          </section>
+
+          <!-- 프로젝트 내용 수정 -->
+          <section class="page-panel" id="projects" data-region="projects-page" hidden>
+            <h2>📁 My Projects</h2>
+            <p>진행 중인 작업을 소개합니다.</p>
+            <div class="cards" data-region="project-cards">
+              <section class="card" data-region="project-one">
+                <h3>🌐 Retro Homepage</h3>
+                <p>Windows 98 감성의 개인 홈페이지.<br>
+                  <b>HTML · 98.css · JavaScript</b></p>
+              </section>
+              <section class="card" data-region="project-two">
+                <h3>📷 Daily Archive</h3>
+                <p>일상을 모으는 사진 기록장.<br><b>준비 중</b></p>
+              </section>
+            </div>
+          </section>
+
+          <!-- 방명록: 메시지 목록은 JS가 생성 -->
+          <section class="page-panel" id="guestbook" data-region="guest-page" hidden>
+            <h2>📓 Guestbook</h2>
+            <p>방문 기념으로 한 줄 남겨주세요.</p>
+
+            <form class="guest-form" id="guestForm" data-region="guest-form">
+              <label>이름
+                <input name="nickname" maxlength="30" required>
+              </label>
+              <label>메시지
+                <textarea name="message" maxlength="500" required></textarea>
+              </label>
+              <button type="submit">글 남기기</button>
+            </form>
+
+            <p><small>현재 브라우저에만 저장되며 다른 방문자와 공유되지 않습니다.</small></p>
+            <div id="guestEntries" data-region="guest-list"></div>
+          </section>
+        </article>
+
+        <!-- 창 내부 상태표시줄 -->
+        <div class="status-bar" data-region="statusbar">
+          <p class="status-bar-field" id="status" role="status">✓ 완료</p>
+          <p class="status-bar-field">🌐 Internet</p>
+          <p class="status-bar-field">100%</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 장난용 팝업: 실제 감염 기능 없음 -->
+  <section class="window virus-window" id="virusWindow"
+           data-region="virus-window" role="dialog"
+           aria-labelledby="virusTitle" aria-describedby="virusMessage" hidden>
+    <div class="title-bar" id="virusDragHandle" data-region="virus-title">
+      <div class="title-bar-text" id="virusTitle">저는 바이러스가 아닙니다.</div>
+      <div class="title-bar-controls">
+        <!-- 98.css의 X 아이콘을 위해 aria-label="Close" 유지 -->
+        <button aria-label="Close" title="닫기" id="closeVirus"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="virus-body" data-region="virus-body">
+        <span class="warning-icon" aria-hidden="true">⚠️</span>
+        <p id="virusMessage">뻥입니다 당신은 감염되었습니다</p>
+      </div>
+      <div class="popup-actions" data-region="virus-actions">
+        <button id="confirmVirus">확인</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 시작 메뉴 -->
+  <aside class="window start-menu" id="startMenu"
+         data-region="start-menu" aria-label="시작 메뉴" hidden>
+    <div class="start-inner">
+      <div class="start-brand" data-region="start-brand">Windows 98</div>
+      <div class="start-items" data-region="start-items">
+        <button id="startHome">🖥️ 내 홈페이지</button>
+        <hr>
+        <button id="showDesktop">🪟 바탕화면 보기</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 화면 하단 작업 표시줄 -->
+  <footer class="taskbar" id="taskbar" data-region="taskbar" aria-label="작업 표시줄">
+    <button class="start-button" id="startButton" data-region="start-button"
+            aria-expanded="false" aria-controls="startMenu">🪟 시작</button>
+
+    <div class="tasks" data-region="tasks">
+      <button class="task-button active" id="homeTask" data-region="home-task"
+              aria-pressed="true" aria-controls="mainWindow">🌐 My Homepage</button>
+      <button class="task-button" id="virusTask" data-region="virus-task"
+              aria-pressed="false" aria-controls="virusWindow" hidden>
+        🎁 저는 바이러스가 아닙니다.
+      </button>
+    </div>
+
+    <div class="tray" data-region="tray">
+      <span aria-label="소리">🔊</span>
+      <time id="clock"></time>
+    </div>
+  </footer>
+
+  <script>
+    // ===== 01. 자주 사용하는 요소: 한 번만 찾아 재사용 =====
+    const $ = selector => document.querySelector(selector);
+
+    const mainWindow = $("#mainWindow");
+    const virusWindow = $("#virusWindow");
+    const homeTask = $("#homeTask");
+    const virusTask = $("#virusTask");
+    const content = $("#content");
+    const status = $("#status");
+    const startMenu = $("#startMenu");
+    const startButton = $("#startButton");
+    const taskbar = $("#taskbar");
+    const panels = document.querySelectorAll(".page-panel");
+    const menuLinks = document.querySelectorAll(".menubar a");
+
+    // ===== 02. 공통 창 표시: 창과 작업 버튼 상태를 함께 변경 =====
+    function setVisible(windowElement, task, visible) {
+      windowElement.hidden = !visible;
+      task.classList.toggle("active", visible);
+      task.setAttribute("aria-pressed", String(visible));
+    }
+
+    // ===== 03. 시작 메뉴 열기 / 닫기 =====
+    function setStartMenu(open) {
+      startMenu.hidden = !open;
+      startButton.setAttribute("aria-expanded", String(open));
+    }
+
+    // ===== 04. 페이지 전환: 흰 영역 안에서 선택한 HTML만 표시 =====
+    function navigate(page) {
+      if (![...panels].some(panel => panel.id === page)) page = "home";
+
+      panels.forEach(panel => {
+        panel.hidden = panel.id !== page;
+      });
+
+      menuLinks.forEach(link => {
+        if (link.dataset.page === page) {
+          link.setAttribute("aria-current", "page");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      });
+
+      content.scrollTop = 0;
+      $("#address").value = "https://my.home/" + page;
+      status.textContent = "✓ 완료";
+      setVisible(mainWindow, homeTask, true);
+      setStartMenu(false);
+    }
+
+    // 메뉴바에서만 소개 / 프로젝트 / 방명록으로 이동
+    $(".menubar").addEventListener("click", event => {
+      const link = event.target.closest("[data-page]");
+      if (!link) return;
+      event.preventDefault();
+      navigate(link.dataset.page);
+    });
+
+    // 바탕화면과 시작 메뉴의 홈페이지 버튼
+    $("#homeIcon").onclick = () => navigate("home");
+    $("#startHome").onclick = () => navigate("home");
+
+    // 홈페이지 작업 버튼: 숨기기 / 다시 표시
+    homeTask.onclick = () => {
+      setVisible(mainWindow, homeTask, mainWindow.hidden);
+    };
+
+    // ===== 05. 방명록 불러오기: 잘못된 저장값은 제외 =====
+    const STORAGE_KEY = "retroGuestbook";
+    let entries = [];
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      if (Array.isArray(saved)) {
+        entries = saved.filter(item =>
+          item &&
+          typeof item.name === "string" &&
+          typeof item.message === "string"
+        );
+      }
+    } catch {
+      // 저장소 차단 또는 데이터 오류일 때 빈 목록으로 시작
+    }
+
+    // ===== 06. 방명록 표시: 사용자 입력은 HTML 대신 텍스트로 출력 =====
+    function renderEntries() {
+      const list = $("#guestEntries");
+      list.replaceChildren();
+
+      entries.forEach(entry => {
+        const item = document.createElement("div");
+        const name = document.createElement("strong");
+        const message = document.createElement("p");
+
+        item.className = "guest-entry";
+        name.textContent = "👤 " + entry.name;
+        message.textContent = entry.message;
+
+        item.append(name, message);
+        list.append(item);
+      });
+    }
+
+    // ===== 07. 방명록 저장: 이벤트를 페이지 이동마다 등록하지 않음 =====
+    $("#guestForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const name = form.elements.nickname.value.trim();
+      const message = form.elements.message.value.trim();
+
+      if (!name || !message) {
+        status.textContent = "이름과 메시지를 입력해주세요.";
+        return;
+      }
+
+      entries.unshift({ name, message });
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        status.textContent = "✓ 메시지를 저장했습니다.";
+      } catch {
+        status.textContent = "저장 불가: 새로고침하면 새 메시지가 사라집니다.";
+      }
+
+      renderEntries();
+      form.reset();
+    });
+
+    // ===== 08. 팝업 위치 제한: 화면과 작업 표시줄 밖으로 나가지 않게 함 =====
+    function positionPopup(left, top) {
+      const maxLeft = Math.max(0, innerWidth - virusWindow.offsetWidth);
+      const maxTop = Math.max(
+        0,
+        taskbar.getBoundingClientRect().top - virusWindow.offsetHeight
+      );
+
+      virusWindow.style.left = Math.max(0, Math.min(left, maxLeft)) + "px";
+      virusWindow.style.top = Math.max(0, Math.min(top, maxTop)) + "px";
+    }
+
+    // 숨긴 사이 화면 크기가 바뀌었을 때 복원 위치 보정
+    function fitPopup() {
+      if (virusWindow.hidden) return;
+      const rect = virusWindow.getBoundingClientRect();
+      positionPopup(rect.left, rect.top);
+    }
+
+    // ===== 09. 팝업 열기: 별도 상태 변수 없이 작업 버튼의 hidden으로 판단 =====
+    $("#virusIcon").onclick = () => {
+      const firstOpen = virusTask.hidden;
+
+      virusTask.hidden = false;
+      setVisible(virusWindow, virusTask, true);
+
+      if (firstOpen) {
+        positionPopup(
+          (innerWidth - virusWindow.offsetWidth) / 2,
+          (taskbar.getBoundingClientRect().top - virusWindow.offsetHeight) / 2
+        );
+      } else {
+        fitPopup();
+      }
+
+      $("#closeVirus").focus();
+    };
+
+    // ===== 10. 팝업 닫기: 창과 작업 버튼 모두 제거 =====
+    function closePopup() {
+      setVisible(virusWindow, virusTask, false);
+      virusTask.hidden = true;
+      $("#virusIcon").focus();
+    }
+
+    $("#closeVirus").onclick = closePopup;
+    $("#confirmVirus").onclick = closePopup;
+
+    // 팝업 작업 버튼: 창만 숨기거나 복원, 작업 버튼은 유지
+    virusTask.onclick = () => {
+      setVisible(virusWindow, virusTask, virusWindow.hidden);
+      fitPopup();
+    };
+
+    // ===== 11. 팝업 드래그: 제목 표시줄에서 마우스 / 터치 이동 =====
+    const dragHandle = $("#virusDragHandle");
+    let drag = null;
+
+    dragHandle.addEventListener("pointerdown", event => {
+      if (drag || event.button !== 0 || event.target.closest("button")) return;
+
+      const rect = virusWindow.getBoundingClientRect();
+      drag = {
+        id: event.pointerId,
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+
+      dragHandle.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+
+    dragHandle.addEventListener("pointermove", event => {
+      if (!drag || event.pointerId !== drag.id) return;
+      positionPopup(event.clientX - drag.x, event.clientY - drag.y);
+    });
+
+    // 드래그 종료 또는 취소 시 이동 상태 초기화
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach(type => {
+      dragHandle.addEventListener(type, event => {
+        if (drag && event.pointerId === drag.id) drag = null;
+      });
+    });
+
+    window.addEventListener("resize", fitPopup);
+
+    // ===== 12. 시작 버튼과 바탕화면 보기 =====
+    startButton.onclick = () => setStartMenu(startMenu.hidden);
+
+    $("#showDesktop").onclick = () => {
+      setVisible(mainWindow, homeTask, false);
+      setVisible(virusWindow, virusTask, false);
+      setStartMenu(false);
+    };
+
+    // 시작 메뉴 바깥을 누르면 닫기
+    document.addEventListener("click", event => {
+      if (!event.target.closest("#startMenu, #startButton")) {
+        setStartMenu(false);
+      }
+    });
+
+    // Esc 키로 시작 메뉴 닫기
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !startMenu.hidden) {
+        setStartMenu(false);
+        startButton.focus();
+      }
+    });
+
+    // ===== 13. 작업 표시줄 시계: 현재 기기의 시간과 날짜 표시 =====
+    const clock = $("#clock");
+
+    function updateClock() {
+      const now = new Date();
+
+      clock.textContent = now.toLocaleTimeString("ko-KR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+      });
+      clock.dateTime = now.toISOString();
+      clock.title = now.toLocaleDateString("ko-KR", { dateStyle: "full" });
+    }
+
+    // ===== 14. 초기 실행 =====
+    renderEntries();
+    navigate("home");
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
